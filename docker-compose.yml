@@ -3,6 +3,7 @@ version: '3.8'
 services:
   rabbitmq:
     image: "rabbitmq:3.11-management-alpine"
+    container_name: rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
@@ -14,3 +15,75 @@ services:
     ports:
     - "5672:5672"
     - "15672:15672"
+    networks:
+      - app-network
+
+  mongodb:
+    container_name: mongodb
+    image: mongo:4.2.1
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - mongo-data:/usr/data/db
+    networks:
+      - app-network
+
+  weatherapi:
+    build:
+      context: ./WeatherApi  
+    container_name: weatherapi
+    restart: unless-stopped
+    depends_on:
+      - rabbitmq
+      - mongodb
+    networks:
+      - app-network
+    environment:
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+    command: ["./main"]
+
+
+  backend:
+    build:
+      context: ./backend  
+    container_name: backend
+    depends_on:
+      - rabbitmq
+      - mongodb
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    environment:
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+    command: ["./main"]
+
+  frontend:
+    build:
+      context: ./frontend  
+    container_name: frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+    volumes:
+      - dist:/dist
+    depends_on:
+      - backend
+      - weatherapi
+      - rabbitmq
+      - mongodb
+
+volumes:
+  dist:
+    driver: local
+  mongo-data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

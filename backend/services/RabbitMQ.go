@@ -6,7 +6,6 @@ import (
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
-
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -18,7 +17,7 @@ type Message struct {
 }
 
 func FetchAndStoreWeatherData(userID primitive.ObjectID, lat, lon float64, signUpDate time.Time) error {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 

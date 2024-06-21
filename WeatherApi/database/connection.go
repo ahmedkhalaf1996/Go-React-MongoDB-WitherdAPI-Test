@@ -15,8 +15,11 @@ var (
 	mongoOnce           sync.Once
 )
 
+// mongodb://admin:password@mongodb
+
+// mongodb://localhost:27017
 const (
-	CONNECTIONSTRING = "mongodb://localhost:27017"
+	CONNECTIONSTRING = "mongodb://admin:password@mongodb"
 	DB               = "testdb"
 )
 
