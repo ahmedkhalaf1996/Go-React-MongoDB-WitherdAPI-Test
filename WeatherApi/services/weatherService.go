@@ -16,7 +16,7 @@ import (
 
 const (
 	baseURL = "http://api.weatherapi.com/v1/history.json"
-	apiKey  = "1084236536cc47d486f32720242006"
+	apiKey  = ""
 )
 
 func FetchAndStoreWeatherData(userID primitive.ObjectID, lat, lon float64, signUpDate time.Time) error {
